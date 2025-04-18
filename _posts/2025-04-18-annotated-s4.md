@@ -70,7 +70,9 @@ DPLR S4는 다음 3단계를 통해 연산 속도 병목을 극복할 수 있습
 **2. Cauchy 커널로 표현**
 Diagonal matrix case는 다음과 같은 [Cauchy 커널](https://en.wikipedia.org/wiki/Cauchy_matrix)의 형태로 변환이 가능하다는 것을 이용합니다.
 
-$$C_{ij} = {{1}\over{\omega_j -\zeta_k}}$$
+$$
+C_{kj} = \frac{1}{\omega_j - \zeta_k}
+$$
 
 **3. Low-rank 보정**  
 Low-rank term이 [Woodbury Identity](링크)를 통해 $\Lambda + P Q^*$가 $\Lambda^{-1}$와 rank-1 보정 항으로 표현될 수 있음을 이용합니다.  
