@@ -12,7 +12,6 @@ tags: [SSM, S4, HiPPO, Annotated-S4, LRA]
 
 > 본 글은 Annotated-S4([링크](https://srush.github.io/annotated-s4/))를 바탕으로 상태공간 모델을 활용한 딥러닝 모델 S4의 기초를 정리한 내용입니다.  
 > 모든 내용은 [Annotated-S4 Github 문서](https://srush.github.io/annotated-s4/)와 [그에 대한 코드](https://github.com/srush/annotated-s4)에 기반하고 있습니다. 
-> SSM에 대한 기본적인 이해가 있다고 가정합니다.
 
 ---
 
@@ -52,10 +51,21 @@ $$A = \Lambda + PQ^*$$
 $\Lambda$는 [diagonal matrix](https://en.wikipedia.org/wiki/Diagonal_matrix)이고 $P, Q$는 복소수인 Low-rank 항입니다. 이를 DPLR(Diagonal Plus Low Rank)라고 부릅니다.
 
 $$\Lambda \in \mathbb{C}^{N \times N}$$
+
 $$P \in \mathbb{C}^{N \times r}$$
+
 $$Q \in \mathbb{C}^{N \times r}$$
+
 $$B \in \mathbb{C}^{N \times 1}$$
+
 $$C \in \mathbb{C}^{1 \times N}$$
+
+WLOG, r=1로 가정합니다.
+
+$$P \in \mathbb{C}^{N \times 1}$$
+
+$$Q \in \mathbb{C}^{N \times 1}$$
+
 
 > Q. 왜 $A$를 DPLR이라고 가정하나요?
 > A. 이후에 나오는 수학적 기술들을 사용하기 위함입니다.
@@ -65,19 +75,22 @@ $$C \in \mathbb{C}^{1 \times N}$$
 DPLR S4는 다음 3단계를 통해 연산 속도 병목을 극복할 수 있습니다. 
 
 **1. Truncated Generating Function 평가**
-커널 $K$를 직접 계산하지 않고 truncated generating function을 [evaluate]()하는 방식으로 [specturm]()을 계산합니다.
+커널 $K$를 직접 계산하지 않고 truncated generating function을 evaluate하는 방식으로 [specturm](https://ko.wikipedia.org/wiki/%EC%8A%A4%ED%8E%99%ED%8A%B8%EB%9F%BC_(%ED%95%A8%EC%88%98%ED%95%B4%EC%84%9D%ED%95%99))을 계산합니다.
+
+> 수학에서 evaluate는 어떤 식이나 함수의 값을 구하는 것을 의미입니다.
+> [행렬의 분해(고윳값 분해, 스펙트럼 분해, 특잇값 분해)](https://syj9700.tistory.com/11)
 
 **2. Cauchy 커널로 표현**
 Diagonal matrix case는 다음과 같은 [Cauchy 커널](https://en.wikipedia.org/wiki/Cauchy_matrix)의 형태로 변환이 가능하다는 것을 이용합니다.
 
 $$
-C_{kj} = \frac{1}{\omega_j - \zeta_k}
+\mathcal{C_{kj}} = \frac{1}{\omega_j - \zeta_k}
 $$
 
 **3. Low-rank 보정**  
-Low-rank term이 [Woodbury Identity](링크)를 통해 $\Lambda + P Q^*$가 $\Lambda^{-1}$와 rank-1 보정 항으로 표현될 수 있음을 이용합니다.  
+Low-rank term이 [Woodbury Identity](https://en.wikipedia.org/wiki/Woodbury_matrix_identity)를 통해 $\Lambda + P Q^*$가 $\Lambda^{-1}$와 rank-1 보정 항으로 표현될 수 있음을 이용합니다.  
 
-Cauchy 커널로 표현하면 Cauchy matrix-vector 곱의 성질을 활용해 **truncated generating function $\hat{K}_L(z)$**를 빠르게 계산할 수 있으며, $\Lambda^{-1}$ 구조로 정리하면 [FFT](링크)를 이용해 전체 커널 계산을 $O(N \log N)$까지 줄일 수 있습니다.
+Cauchy 커널로 표현하면 Cauchy matrix-vector 곱의 성질을 활용해 **truncated generating function $\hat{K}_L(z)$**를 빠르게 계산할 수 있으며, $\Lambda^{-1}$ 구조로 정리하면 [FFT](https://en.wikipedia.org/wiki/Fast_Fourier_transform)를 이용해 전체 커널 계산을 $O(N \log N)$까지 줄일 수 있습니다.
 
 #### Step 1. Truncated Generating Function
 S4는 커널 계산을 시간 도메인에서 직접 수행하지 않고, **생성 함수(generating function)**를 도입하여 주파수 도메인에서 효율적으로 계산합니다.
@@ -91,7 +104,8 @@ $$\tilde{K}(z) = \tilde{C}(zI-\tilde{A})^{-1}\bar{B}$$
 $\tilde{K}(z)$를 FFT 주파수 노드 $z \in \Omega_L$에서 평가하고, 이를 IFFT (역 푸리에 변환)하면 $O(L\text{log}L)$에서 시간 도메인 커널 $K$를 복원할 수 있습니다.
 
 $$
-\Omega = \left\{ \exp\left(2\pi i \frac{k}{L} \right) : k \in [L] \right\}
+\Omega = \left\{ \exp\left(2\pi i 
+\frac{k}{L} \right) : k \in [L] \right\}
 $$
 
 > 디테일한 내용은 논문 부록 C.3에 있습니다.
@@ -161,7 +175,7 @@ Low-rank는 일반성을 잃지않고 r=1로 가정할 수 있습니다.
 
 $$P, Q \in \mathbb{C}^{N \times 1} :\text{1-rank term} $$
 
-DPLR 구조를 활용하면 역행렬 계산을 [Woodbury identity](https://en.wikipedia.org/wiki/Woodbury_matrix_identity)로 다음과 같이 변형할 수 있습니다:
+DPLR 구조를 활용하면 역행렬 계산을 Woodbury identity로 다음과 같이 변형할 수 있습니다:
 
 $$
 (\Lambda - P Q^*)^{-1} = \Lambda^{-1} + \Lambda^{-1} P \left(I - Q^* \Lambda^{-1} P \right)^{-1} Q^* \Lambda^{-1}
@@ -216,7 +230,7 @@ $$\Lambda \in \mathbb{C}^{N \times N}: \text{diagonal matrix}$$
 
 $$P, Q \in \mathbb{R}^{N \times r}: \text{low-rank term}$$
 
-이번에도 일반성을 잃지 않고 r=1로 둘 수 있습니다. 
+이번에도 WLOG, Low rank를 1로 가정합니다.
 
 $$P, Q \in \mathbb{R}^{N \times 1}: \text{1-rank term}$$
 
@@ -229,7 +243,7 @@ $$P, Q \in \mathbb{R}^{N \times 1}: \text{1-rank term}$$
 > 자세한 내용은 심화편에서 다루겠습니다.
 
 #### Advantage
-1. 복소수 고윳값 $\Lambda$의 실수/허수 부분을 따로 제어할 수 있어 학습 안정성에 유리합니다.
+1. 복소수 고유값 $\Lambda$의 실수/허수 부분을 따로 제어할 수 있어 학습 안정성에 유리합니다.
 2. $A$ 행렬을 Hermitian(에르미트) 행렬로 바꾸면 더 빠르고 정확한 diagonalization이 가능합니다. (하지만 논문 시점에서는 JAX가 에르미트 행렬에 대한 대각화를 지원하지는 않는다고 함)
 
 추가적인 구조 제약으로 $P=Q$를 설정하면 SSM의 안정성이 더욱 향상되고 실전 학습 성능이 개선되는 것을 후속 연구에서 보였습니다. [링크](https://en.wikipedia.org/wiki/Unitary_matrix)
@@ -238,11 +252,10 @@ $$P, Q \in \mathbb{R}^{N \times 1}: \text{1-rank term}$$
 > - 실습 코드는 [Part 3](https://srush.github.io/annotated-s4/)를 참고하세요.
 
 ## Conclusion
-수학적인 세부 전개보다는 전체 구조와 흐름에 초점을 맞춰,
-S4 커널 계산이 어떤 아이디어와 구조 위에 설계되었는지를 이해하는 데에 집중했습니다.
+수학적인 세부 전개보다는 전체 구조와 흐름에 초점을 맞춰, S4 커널 계산이 어떤 아이디어와 구조 위에 설계되었는지를 이해하는 데에 집중했습니다.
 
 Diagonal -> DPLR -> NPLR로 이어지는 흐름과, Cauchy 커널 및 FFT 기반 계산 방식은 S4가 어떻게 효율성과 표현력을 동시에 확보했는지를 보여주는 핵심적인 아이디어입니다.
 
-수식 전개같은 디테일한 내용은 심화편인 **"S4 Appendix로 보는 Algorithm"**에서 상세히 다뤄보도록 하겠습니다.
+수식 전개같은 디테일한 내용은 심화편에서 상세히 다뤄보도록 하겠습니다.
 
 이번 글이 S4의 논리 흐름을 대략적으로 이해하는 데 도움이 되었기를 바랍니다.
