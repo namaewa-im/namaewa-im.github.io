@@ -90,7 +90,9 @@ $$\tilde{K}(z) = \tilde{C}(zI-\tilde{A})^{-1}\bar{B}$$
 
 $\tilde{K}(z)$를 FFT 주파수 노드 $z \in \Omega_L$에서 평가하고, 이를 IFFT (역 푸리에 변환)하면 $O(L\text{log}L)$에서 시간 도메인 커널 $K$를 복원할 수 있습니다.
 
-$$\Omega = \{{\text{exp}(2\pi i {{k}\over{L}}): k \in [L]}\}$$
+$$
+\Omega = \left\{ \exp\left(2\pi i \frac{k}{L} \right) : k \in [L] \right\}
+$$
 
 > 디테일한 내용은 논문 부록 C.3에 있습니다.
 
