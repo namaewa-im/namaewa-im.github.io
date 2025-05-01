@@ -357,7 +357,7 @@ python -m s4.train dataset=imdb-classification layer=s4 model.layer.N=64 model.n
 
 
 ## 코드 구조 리뷰
-Annotated-S4 코드에서 가장 중요한 두 파일인 [s4.py]()와 [train.py]()의 구조와 작동 방식을 살펴봅니다.
+Annotated-S4 코드에서 가장 중요한 두 파일인 [s4.py](https://github.com/srush/annotated-s4/blob/main/s4/s4.py)와 [train.py](https://github.com/srush/annotated-s4/blob/main/s4/train.py)의 구조와 작동 방식을 살펴봅니다.
 
 ### s4.py
 
@@ -449,8 +449,7 @@ S4를 Flax 모델로 통합
 ##### 3-1. SSMLayer
 ```
 setup: A, B, C, D, log_step, ssm, k, x_k_1
-call: if not decode: causal_convolution(u,k)+D*u
-else: scan_SSM으로 y_s.real+D*u
+call: if not decode: causal_convolution(u,k)+D*u else: scan_SSM으로 y_s.real+D*u
 ```
 ##### 3-2. cloneLayer
 SSMLayer나 S4Layer를 layer dim H개로 복제
@@ -462,8 +461,7 @@ call: norm-> seq->drop-> glu-> skip+dorp-> norm
 ```
 ##### 3-4. StackedModel
 ```
-setup: encoder if embedding: Embedding else: Dense
-decoder, layers = (SequenceBlock())
+setup: encoder (if embedding: Embedding else: Dense), decoder, layers = (SequenceBlock())
 call: classfication if embedding: embedding else: decode
 encoder-> layer-> decoder-> log_softmax
 ```
