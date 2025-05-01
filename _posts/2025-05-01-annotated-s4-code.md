@@ -79,13 +79,117 @@ python -m train dataset=listops-classification +dataset.data_dir=/workspace/lra_
 ``` 
 
 #### imdb
+imdb의 arrow 데이터를 가지고 있다면 /annotated-s4/s4/data.py의 create_imdb_classification_dataset()을 다음과 같이 외부 데이터를 경로에서 데이터를 읽어오도록 수정할 수 있습니다:
+```python
+def create_imdb_classification_dataset(bsz=128):
+    # Constants, the default max length is 4096
+    APPEND_BOS = False
+    APPEND_EOS = True
+    LOAD_WORDER = 20
+    MIN_FREQ = 15
+
+    SEQ_LENGTH, N_CLASSES, IN_DIM = 2048, 2, 135
+
+    # 외부 데이터 경로 설정
+    data_path = "/workspace/s4/data/imdb/imdb/plain_text/0.0.0/e6281661ce1c48d982bc483cf8a173c1bbeb5d31/"
+    
+    # 외부 데이터 로드
+    train_data = load_dataset("arrow", data_files=f"{data_path}imdb-train.arrow")
+    test_data = load_dataset("arrow", data_files=f"{data_path}imdb-test.arrow")
+    
+    # DatasetDict 생성
+    dataset = DatasetDict(
+        train=train_data["train"],
+        test=test_data["train"]  # arrow 파일은 기본적으로 "train" 스플릿을 가짐
+    )
+
+    # train 데이터의 10%를 validation으로 분할
+    train_val = dataset["train"].train_test_split(test_size=0.1, seed=42)
+    dataset = DatasetDict(
+        train=train_val["train"],
+        val=train_val["test"],
+        test=dataset["test"]
+    )
+
+    l_max = SEQ_LENGTH - int(APPEND_BOS) - int(APPEND_EOS)
+
+    # step one, byte level tokenization
+    dataset = dataset.map(
+        lambda example: {"tokens": list(example["text"])[:l_max]},
+        remove_columns=["text"],
+        keep_in_memory=True,
+        load_from_cache_file=False,
+        num_proc=max(LOAD_WORDER, 1),
+    )
+
+    # print("byte characters for first example:", dataset['train']['tokens'][0])
+
+    # step two, build vocabulary based on the byte characters, each character appear at least MIN_FREQ times
+    vocab = torchtext.vocab.build_vocab_from_iterator(
+        dataset["train"]["tokens"],
+        min_freq=MIN_FREQ,
+        specials=(
+            ["<pad>", "<unk>"]
+            + (["<bos>"] if APPEND_BOS else [])
+            + (["<eos>"] if APPEND_EOS else [])
+        ),
+    )
+
+    # step three, numericalize the tokens
+    vocab.set_default_index(vocab["<unk>"])
+
+    dataset = dataset.map(
+        lambda example: {
+            "input_ids": vocab(
+                (["<bos>"] if APPEND_BOS else [])
+                + example["tokens"]
+                + (["<eos>"] if APPEND_EOS else [])
+            )
+        },
+        remove_columns=["tokens"],
+        keep_in_memory=True,
+        load_from_cache_file=False,
+        num_proc=max(LOAD_WORDER, 1),
+    )
+
+    # print("numericalize result for first example:", dataset['train']['input_ids'][0])
+
+    dataset["train"].set_format(type="torch", columns=["input_ids", "label"])
+    dataset["test"].set_format(type="torch", columns=["input_ids", "label"])
+
+    def imdb_collate(batch):
+        batchfy_input_ids = [data["input_ids"] for data in batch]
+        batchfy_labels = torch.cat(
+            [data["label"].unsqueeze(0) for data in batch], dim=0
+        )
+        batchfy_input_ids = torch.nn.utils.rnn.pad_sequence(
+            batchfy_input_ids + [torch.zeros(SEQ_LENGTH)],
+            padding_value=vocab["<pad>"],
+            batch_first=True,
+        )
+        batchfy_input_ids = torch.nn.functional.one_hot(
+            batchfy_input_ids[:-1], IN_DIM
+        )
+        return batchfy_input_ids, batchfy_labels
+
+    trainloader = torch.utils.data.DataLoader(
+        dataset["train"], batch_size=bsz, shuffle=True, collate_fn=imdb_collate
+    )
+
+    testloader = torch.utils.data.DataLoader(
+        dataset["test"], batch_size=bsz, shuffle=True, collate_fn=imdb_collate
+    )
+
+    return trainloader, testloader, N_CLASSES, SEQ_LENGTH, IN_DIM
+```
+만약 이런 에러가 뜬다면
 ```bash
 TypeError: An invalid dataloader was returned from SequenceLightningModule.val_dataloader(). Found None.
 ```
-해결 방법: dataset config에서 val_split: 0.1로 수정
+dataset config에서 val_split: 0.1로 설정합니다.
 
 #### Pathfinder, Path-X, AAN
-> Pathfinder, Path-X, AAN는 annotated-s4/s4/data.py에서 따로 제공하고 있지 않기 때문에 해당 코드로 학습을 돌리기 위해서는 create_{pathfinder, pathx, aan}_dataset()을 직접 만들어야합니다. 
+> Pathfinder, Path-X, AAN는 annotated-s4/s4/data.py에서 따로 제공하고 있지 않기 때문에 해당 데이터셋을 사용하기 위해서는 create_{pathfinder, pathx, aan}_dataset()을 직접 만들어야합니다. 
 
 다음은 create_pathfinder_dataset()의 예시입니다. annotated-s4/s4/data.py 아래에 다음과 같이 작성합니다:
 
@@ -227,15 +331,28 @@ python -m s4.train dataset=listops-classification wandb.mode=online wandb.projec
 train.py 실행 시 로그인한 계정에 자동으로 로깅되어 실시간으로 그래프를 확인할 수 있습니다:
 
 #### ListOps
+
+```bash
+python -m s4.train dataset=listops-classification layer=s4 model.layer.N=64 model.n_layers=6 model.d_model=128 model.prenorm=False model.dropout=0.0 train.lr=0.01 train.bsz=100 train.epochs=50 train.weight_decay=0.01 wandb.mode=online wandb.project=Annotated-s4-listops train.lr_schedule=true
+```
 ![listops](/assets/img/annotated-s4/listops1.webp)
 
 #### IMDb
+```bash
+python -m s4.train dataset=imdb-classification layer=s4 model.d_model=64 model.n_layers=4 model.layer.N=64  model.prenorm=True model.dropout=0.0 train.lr=1e-3 train.bsz=50 train.epochs=20 train.weight_decay=0.01 train.lr_schedule=true seed=1 wandb.mode=online wandb.project=Annotated-s4-imdb
+```
 ![imdb](/assets/img/annotated-s4/imdb1.webp)
 
 #### Cifar-10
+```bash
+python -m s4.train dataset=cifar-classification layer=s4 model.d_model=512 model.n_layers=6 model.layer.N=64 model.prenorm=False model.dropout=0.25 train.lr=5e-3 train.bsz=50 train.epochs=200 train.weight_decay=0.01 train.lr_schedule=true seed=1 wandb.mode=online wandb.project=Annotated-s4-cifar10
+```
 ![cifar10](/assets/img/annotated-s4/cifar1.webp)
 
 #### Pathfinder
+```bash
+python -m s4.train dataset=imdb-classification layer=s4 model.layer.N=64 model.n_layers=4 model.d_model=64 model.prenorm=True model.dropout=0.0 train.lr=5e-3 train.bsz=50 train.epochs=100 train.weight_decay=0.01 train.lr_schedule=true seed=1 wandb.mode=online wandb.project=Annotated-s4-imdb
+```
 ![pathfinder](/assets/img/annotated-s4/pathfinder1.webp)
 
 
