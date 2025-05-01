@@ -35,24 +35,16 @@ tags: [SSM, S4, Annotated-S4, Docker, JAX,]
 	```
 
 ### 🔽 코드 클론 및 디렉토리 이동
-
-Local 환경에서는 원하는 곳에 Annotated-S4 저장소를 클론합니다.  
-
-Docker 환경에서는 
-```
-mkdir /workspace
-cd /workspace
-```
-한 후 annotated s4 저장소를 클론합니다.
-
+Annotated-S4 저장소를 클론한 후, 작업 디렉토리로 이동합니다:
 ```bash
 git clone https://github.com/srush/annotated-s4.git
 cd annotated-s4
 ```
 
 ### 의존성 설치
+공식 [requirements.txt](https://github.com/srush/annotated-s4/blob/main/requirements-gpu.txt)
 
-이 [requirements.txt](/assets/data/s4/annotated-s4.txt)는 하나의 예시이므로 실제 사용 시 환경에 맞게 수정이 필요할 수 있습니다.
+> 제가 구성한 [requirements.txt](/assets/data/s4/annotated-s4.txt)도 제공하겠습니다. 하나의 예시이므로 실제 사용 시 환경에 맞게 수정이 필요할 수도 있습니다. python 3.7.11
 
 ---
 
@@ -68,7 +60,7 @@ python -m s4.train dataset=cifar-classification layer=s4d train.epochs=100 train
 ```
 ### 📂 LRA Dataset Mount
 
-LRA dataset 중 Annotated-s4가 기본으로 제공하는 것은 MNIST Classification, CIFAR-10 Classification 입니다. listops, aan, pathfinder를 실행하기 위해서는 [LRA 벤치마크 데이터셋을 다운](https://namaewa-im.github.io/posts/lra/#how-to-download-dataset)받아야합니다.
+> LRA dataset 중 Annotated-s4가 기본으로 제공하는 것은 MNIST Classification, CIFAR-10 Classification 입니다. listops, aan, pathfinder를 실행하기 위해서는 [LRA 벤치마크 데이터셋을 다운](https://namaewa-im.github.io/posts/lra/#how-to-download-dataset)받아야합니다.
 
 LRA 벤치마크 데이터셋을 로컬 또는 Docker 환경에 마운트합니다:
 
@@ -93,7 +85,7 @@ TypeError: An invalid dataloader was returned from SequenceLightningModule.val_d
 해결 방법: dataset config에서 val_split: 0.1로 수정
 
 #### Pathfinder, Path-X, AAN
-Pathfinder, Path-X, AAN는 annotated-s4/s4/data.py에서 따로 제공하고 있지 않기 때문에 해당 코드로 학습을 돌리기 위해서는 create_{pathfinder, pathx, aan}_dataset()을 직접 만들어야합니다. 
+> Pathfinder, Path-X, AAN는 annotated-s4/s4/data.py에서 따로 제공하고 있지 않기 때문에 해당 코드로 학습을 돌리기 위해서는 create_{pathfinder, pathx, aan}_dataset()을 직접 만들어야합니다. 
 
 다음은 create_pathfinder_dataset()의 예시입니다. annotated-s4/s4/data.py 아래에 다음과 같이 작성합니다:
 
@@ -254,30 +246,14 @@ Annotated-S4 코드에서 가장 중요한 두 파일인 [s4.py]()와 [train.py]
 
 s4.py는 3개의 주요 층위로 구성됩니다.
 
-#### 1. 이론 구현 레벨 - SSM의 기본 연산
-**random_SSM(rng, N):** A, B, C 생성  
+#### 1. 이론 구현 레벨
+SSM의 기본 연산
+
+> **random_SSM(rng, N):** A, B, C 생성  
 **discretize(A, B, C, step):** Ab, Bb, C  
 **scan_SSM(Ab, Bb, Cb, u, x0):** recurrence 처리  
 **run_SSM(A, B, C, u):** 전체 시퀀스 처리  
 
-#### 2. 신호 처리 레벨 - SSM을 convolution 커널로 변환
-**K_conv(Ab, Bb, Cb, L):** 커널 생성  
-**causal_convolution(u, K):** 컨볼루션 계산  
-**K_gen_DPLR(...), kernel_DPLR(...):** DPLR 기반 커널 생성  
-**discrete_DPLR(...):** RNN용 커널 이산화  
-
-#### 3. Neural Network 레벨 - S4를 Flax 모델로 통합
-
-**S4Layer:** CNN 또는 RNN 모드 지원하는 핵심 레이어  
-**cloneLayer:** H개의 S4Layer 복제 지원  
-**SequenceBlock:** S4Layer + Dropout + Dense를 묶은 블록  
-**StackedModel:** 여러 레이어를 쌓고, encoder/decoder 구성  
-**BatchStackedModel:** 배치 단위 처리  
-
-
-### s4.py 모듈 입출력 구조
-
-#### 1. 이론 구현 레벨
 ##### 1-1. random_SSM
 ```
 input: rng, N
@@ -304,7 +280,14 @@ input: A, B, C, u
 return: y
 ```
 
-#### 2. 신호 처리 레벨
+#### 2. 신호 처리 레벨 
+주파수 영역에서의 K 계산
+
+> **K_conv(Ab, Bb, Cb, L):** 커널 생성  
+**causal_convolution(u, K):** 컨볼루션 계산  
+**K_gen_DPLR(...), kernel_DPLR(...):** DPLR 기반 커널 생성  
+**discrete_DPLR(...):** 커널 이산화  
+
 ##### 2-1. K_conv
 ```
 input: Ab, Bb, Cb, L
@@ -338,6 +321,14 @@ return: Ab, Bb, Cb.conj()
 ```
 
 #### 3. Neural Network 레벨
+S4를 Flax 모델로 통합
+
+> **S4Layer:** training mode/decode mode 모드 지원  
+**cloneLayer:** H개의 S4Layer 복제 지원  
+**SequenceBlock:** S4Layer + Dropout + Dense를 묶은 블록  
+**StackedModel:** 여러 레이어를 쌓고, encoder/decoder 구성  
+**BatchStackedModel:** 배치사이즈 B개로의 복제 지원
+
 ##### 3-1. SSMLayer
 ```
 setup: A, B, C, D, log_step, ssm, k, x_k_1
@@ -373,13 +364,12 @@ call: if not decode: causal_convolution else: scan_SSM
 #### train.py 구조
 모델 학습과 평가를 위한 루틴이 포함되어 있습니다.
 
-**create_train_state()**: 모델 초기화 및 옵티마이저 구성  
+> **create_train_state()**: 모델 초기화 및 옵티마이저 구성  
 **train_epoch()**: 1 epoch 학습 루프 수행  
 **validate()**: 검증 루프 수행  
 **train_step() / eval_step()**: JIT 기반 1 step 학습/검증 처리  
 **example_train()**: 전체 학습 과정 조립 및 수행  
 
-#### train.py 모듈 입출력
 ##### 1. create_train_state: 모델 파라미터 초기화 및 옵티마이저 설정
 ```
 input: rng, model_cls, trainloader, lr, lr_layer, lr_schedule, weight_decay, total_steps=1
@@ -411,7 +401,7 @@ input: dataset, layer, seed, model_cfg, train_cfg
 return: None
 ```
 
-###### example_train의 입출력/코드 흐름
+##### example_train의 입출력/코드 흐름
 
 **입력:** Hydra로부터 받은 cfg: DictConfig  
 **출력:** None(모델 학습 및 wandb logging, checkpoint 저장)
