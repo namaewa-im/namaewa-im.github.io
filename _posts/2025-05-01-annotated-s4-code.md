@@ -1,5 +1,5 @@
 ---
-title: "[Annotated-S4] 코드 실행 방법 및 코드 리뷰"
+title: "[Annotated S4] 코드 실행 방법 및 코드 리뷰"
 date: 2025-05-01 21:00:00 +0900
 description: "본 글은 https://github.com/srush/annotated-s4를 바탕으로 작성된 글입니다."
 math: true
@@ -36,7 +36,14 @@ tags: [SSM, S4, Annotated-S4, Docker, JAX,]
 
 ### 🔽 코드 클론 및 디렉토리 이동
 
-Annotated-S4 저장소를 클론한 후, 작업 디렉토리로 이동합니다:
+Local 환경에서는 원하는 곳에 Annotated-S4 저장소를 클론합니다.  
+
+Docker 환경에서는 
+```
+mkdir /workspace
+cd /workspace
+```
+한 후 annotated s4 저장소를 클론합니다.
 
 ```bash
 git clone https://github.com/srush/annotated-s4.git
