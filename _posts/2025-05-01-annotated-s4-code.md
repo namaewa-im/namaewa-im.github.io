@@ -270,93 +270,92 @@ s4.py는 3개의 주요 층위로 구성됩니다.
 
 ### s4.py 모듈 입출력 구조
 
-**1. 이론 구현 레벨**
-#### 1-1. random_SSM
+#### 1. 이론 구현 레벨
+##### 1-1. random_SSM
 ```
 input: rng, N
 return: A, B, C
 ```
-#### 1-2. discretize
+##### 1-2. discretize
 ```
 input: A, B, C, step
 return: Ab, Bb, C
 ```
-#### 1-3. scan_SSM
+##### 1-3. scan_SSM
 ```
 input: Ab, Bb, Cb, u, x0
 return: jax.lax.scan(step, x0, u)
 ```
-##### 1-3-1. step
+###### 1-3-1. step
 ```
 input: x_k_1, u_k
 return x_k, y_k
 ```
-#### 1-4. run_SSM
+##### 1-4. run_SSM
 ```
 input: A, B, C, u
 return: y
 ```
 
-**2. 신호 처리 레벨**
-#### 2-1. K_conv
+#### 2. 신호 처리 레벨
+##### 2-1. K_conv
 ```
 input: Ab, Bb, Cb, L
 return: K
 ```
-#### 2-2. causal_convolution
+##### 2-2. causal_convolution
 ```
 input: u, K
 return: y 
 ```
-#### 2-3. K_gen_DPLR
+##### 2-3. K_gen_DPLR
 ```
 input: Lamdba, P, Q, B, C, step
 return: gen
 ```
-
-##### 2-3-1. cauchy_dot
+###### 2-3-1. cauchy_dot
 ```
 input: a, g, Lambda
 out: gen
 ```
-#### 2-4. kernel_DPLR
+##### 2-4. kernel_DPLR
 ```
 input: Lambda, P, Q, B, C, step, L
 return: y.real
 ```
 
-#### 2-5. discrete_DPLR
+##### 2-5. discrete_DPLR
 ```
 input: Lambda, P, Q, B, C, step, L
 return: Ab, Bb, Cb.conj()
 ```
 
-**3. Neural Network 레벨**
-#### 3-1. SSMLayer
+#### 3. Neural Network 레벨
+##### 3-1. SSMLayer
 ```
 setup: A, B, C, D, log_step, ssm, k, x_k_1
 call: if not decode: causal_convolution(u,k)+D*u
 else: scan_SSM으로 y_s.real+D*u
 ```
-#### 3-2. cloneLayer
+##### 3-2. cloneLayer
 SSMLayer나 S4Layer를 layer dim H개로 복제
 
-#### 3-3. SequenceBlock
+##### 3-3. SequenceBlock
 ```
 setup: seq, layer_cls, norm, out, glu, out2, drop, ...
 call: norm-> seq->drop-> glu-> skip+dorp-> norm
 ```
-#### 3-4. StackedModel
+##### 3-4. StackedModel
 ```
 setup: encoder if embedding: Embedding else: Dense
 decoder, layers = (SequenceBlock())
 call: classfication if embedding: embedding else: decode
 encoder-> layer-> decoder-> log_softmax
 ```
-#### 3-5. BatchStakedModel
+##### 3-5. BatchStakedModel
 배치사이즈 B개로 복제
 
-#### 3-6. S4Layer
+##### 3-6. S4Layer
 ```
 setup: Lambda_re, Lambda_im, Lambda, P, B, C, D, step
 if not decode: K else: discrete_DPLR
