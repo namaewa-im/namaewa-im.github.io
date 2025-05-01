@@ -1,10 +1,10 @@
 ---
 title: "[Annotated-S4] 코드 실행 방법 및 코드 리뷰"
 date: 2025-05-01 21:00:00 +0900
-description: "본 글은 Annotated-S4의 코드를 바탕으로 작성된 글입니다."
+description: "본 글은 https://github.com/srush/annotated-s4를 바탕으로 작성된 글입니다."
 math: true
 image:
-  path: /assets/img/favicons/web-app-manifest-512x512.png
+  path: /assets/img/favicons/favicon-96x96.png
   alt: "S4"
 categories: [code]
 tags: [SSM, S4, Annotated-S4, Docker, JAX,]
@@ -59,33 +59,33 @@ CIFAR Classification
 ```bash
 python -m s4.train dataset=cifar-classification layer=s4d train.epochs=100 train.bsz=50 model.n_layers=6 model.d_model=512 model.dropout=0.25 train.lr=5e-3 train.weight_decay=0.01 train.lr_schedule=true seed=1 +model.layer.scaling=linear
 ```
-#### 📂 LRA Dataset Mount
+### 📂 LRA Dataset Mount
 
 LRA dataset 중 Annotated-s4가 기본으로 제공하는 것은 MNIST Classification, CIFAR-10 Classification 입니다. listops, aan, pathfinder를 실행하기 위해서는 [LRA 벤치마크 데이터셋을 다운](https://namaewa-im.github.io/posts/lra/#how-to-download-dataset)받아야합니다.
 
 LRA 벤치마크 데이터셋을 로컬 또는 Docker 환경에 마운트합니다:
 
-##### 다운받을 로컬 위치
+#### 다운받을 로컬 위치
 ~/Downloads/lra_release/lra_release
 
-##### Docker 실행 코드
+#### Docker 실행 코드
 ```bash
 docker run -it --gpus all -v ~/Downloads/lra_release/lra_release:/workspace/lra_release <image>:<tag> bash
 ```
 데이터셋이 저장되는 컨테이너 내부 경로는 /workspace/lra_release입니다.
 
-##### 실행 예시
+#### 실행 예시
 ```bash
 python -m train dataset=listops-classification +dataset.data_dir=/workspace/lra_release/listops-1000
 ``` 
 
-##### imdb
+#### imdb
 ```bash
 TypeError: An invalid dataloader was returned from SequenceLightningModule.val_dataloader(). Found None.
 ```
 해결 방법: dataset config에서 val_split: 0.1로 수정
 
-##### Pathfinder, Path-X, AAN
+#### Pathfinder, Path-X, AAN
 Pathfinder, Path-X, AAN는 annotated-s4/s4/data.py에서 따로 제공하고 있지 않기 때문에 해당 코드로 학습을 돌리기 위해서는 create_{pathfinder, pathx, aan}_dataset()을 직접 만들어야합니다. 
 
 다음은 create_pathfinder_dataset()의 예시입니다. annotated-s4/s4/data.py 아래에 다음과 같이 작성합니다:
@@ -248,24 +248,24 @@ Annotated-S4 코드에서 가장 중요한 두 파일인 [s4.py]()와 [train.py]
 s4.py는 3개의 주요 층위로 구성됩니다.
 
 #### 1. 이론 구현 레벨 - SSM의 기본 연산
-**random_SSM(rng, N):** A, B, C 생성
-**discretize(A, B, C, step):** Ab, Bb, C
-**scan_SSM(Ab, Bb, Cb, u, x0):** recurrence 처리
-**run_SSM(A, B, C, u):** 전체 시퀀스 처리
+**random_SSM(rng, N):** A, B, C 생성  
+**discretize(A, B, C, step):** Ab, Bb, C  
+**scan_SSM(Ab, Bb, Cb, u, x0):** recurrence 처리  
+**run_SSM(A, B, C, u):** 전체 시퀀스 처리  
 
 #### 2. 신호 처리 레벨 - SSM을 convolution 커널로 변환
-**K_conv(Ab, Bb, Cb, L):** 커널 생성
-**causal_convolution(u, K):** 컨볼루션 계산
-**K_gen_DPLR(...), kernel_DPLR(...):** DPLR 기반 커널 생성
-**discrete_DPLR(...):** RNN용 커널 이산화
+**K_conv(Ab, Bb, Cb, L):** 커널 생성  
+**causal_convolution(u, K):** 컨볼루션 계산  
+**K_gen_DPLR(...), kernel_DPLR(...):** DPLR 기반 커널 생성  
+**discrete_DPLR(...):** RNN용 커널 이산화  
 
 #### 3. Neural Network 레벨 - S4를 Flax 모델로 통합
 
-**S4Layer:** CNN 또는 RNN 모드 지원하는 핵심 레이어
-**cloneLayer:** H개의 S4Layer 복제 지원
-**SequenceBlock:** S4Layer + Dropout + Dense를 묶은 블록
-**StackedModel:** 여러 레이어를 쌓고, encoder/decoder 구성
-**BatchStackedModel:** 배치 단위 처리
+**S4Layer:** CNN 또는 RNN 모드 지원하는 핵심 레이어  
+**cloneLayer:** H개의 S4Layer 복제 지원  
+**SequenceBlock:** S4Layer + Dropout + Dense를 묶은 블록  
+**StackedModel:** 여러 레이어를 쌓고, encoder/decoder 구성  
+**BatchStackedModel:** 배치 단위 처리  
 
 
 ### s4.py 모듈 입출력 구조
@@ -366,11 +366,11 @@ call: if not decode: causal_convolution else: scan_SSM
 #### train.py 구조
 모델 학습과 평가를 위한 루틴이 포함되어 있습니다.
 
-**create_train_state()**: 모델 초기화 및 옵티마이저 구성
-**train_epoch()**: 1 epoch 학습 루프 수행
-**validate()**: 검증 루프 수행
-**train_step() / eval_step()**: JIT 기반 1 step 학습/검증 처리
-**example_train()**: 전체 학습 과정 조립 및 수행
+**create_train_state()**: 모델 초기화 및 옵티마이저 구성  
+**train_epoch()**: 1 epoch 학습 루프 수행  
+**validate()**: 검증 루프 수행  
+**train_step() / eval_step()**: JIT 기반 1 step 학습/검증 처리  
+**example_train()**: 전체 학습 과정 조립 및 수행  
 
 #### train.py 모듈 입출력
 ##### 1. create_train_state: 모델 파라미터 초기화 및 옵티마이저 설정
@@ -406,24 +406,24 @@ return: None
 
 ###### example_train의 입출력/코드 흐름
 
-**입력:** Hydra로부터 받은 cfg: DictConfig
+**입력:** Hydra로부터 받은 cfg: DictConfig  
 **출력:** None(모델 학습 및 wandb logging, checkpoint 저장)
 
-[init]
-    - torch/jax random seed 설정
-    - 데이터셋 로딩 (Datasets[dataset])
-    - 모델 클래스 결정 (Models[layer])
-    - 모델 설정 값 수정 (model.layer.l_max 등)
-    - 모델 partial 생성 (BatchStackedModel(layer_cls, ...))
+[init]  
+    - torch/jax random seed 설정  
+    - 데이터셋 로딩 (Datasets[dataset])  
+    - 모델 클래스 결정 (Models[layer])  
+    - 모델 설정 값 수정 (model.layer.l_max 등)  
+    - 모델 partial 생성 (BatchStackedModel(layer_cls, ...))  
 
-[Model init]
+[Model init]  
     - create_train_state()로 파라미터 초기화 + 옵티마이저 설정
 
-[epoch loop]
-for epoch:
-    - train_epoch() 호출 → train_step 반복
-    - validate() 호출 → eval_step 반복
-    - wandb log, checkpoint 저장, 샘플링 수행
+[epoch loop]  
+for epoch:  
+    - train_epoch() 호출 → train_step 반복  
+    - validate() 호출 → eval_step 반복  
+    - wandb log, checkpoint 저장, 샘플링 수행  
 
 #### 전체 코드 흐름
 config.yaml -> main() -> example_train() -> create_train_state() -> train_epoch() -> validate()
