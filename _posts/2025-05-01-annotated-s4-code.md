@@ -452,7 +452,7 @@ setup: A, B, C, D, log_step, ssm, k, x_k_1
 call: if not decode: causal_convolution(u,k)+D*u else: scan_SSM으로 y_s.real+D*u
 ```
 ##### 3-2. cloneLayer
-SSMLayer나 S4Layer를 layer dim H개로 복제
+SSMLayer나 S4Layer를 layer dim H개로 복제 (L) -> (H,L)
 
 ##### 3-3. SequenceBlock
 ```
@@ -466,7 +466,7 @@ call: classfication if embedding: embedding else: decode
 encoder-> layer-> decoder-> log_softmax
 ```
 ##### 3-5. BatchStakedModel
-배치사이즈 B개로 복제
+StackedModel을 배치사이즈 B개로 복제 (H,L) -> (B, H, L)
 
 ##### 3-6. S4Layer
 ```
