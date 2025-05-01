@@ -1,0 +1,176 @@
+absl-py==1.4.0
+aiohttp==3.8.6
+aiosignal==1.3.1
+antlr4-python3-runtime==4.9.3
+astunparse==1.6.3
+async-timeout==4.0.3
+asynctest==0.13.0
+attrs==21.4.0
+backcall @ file:///home/ktietz/src/ci/backcall_1611930011877/work
+beautifulsoup4 @ file:///tmp/build/80754af9/beautifulsoup4_1631874778482/work
+black==23.3.0
+brotlipy==0.7.0
+cachetools==5.5.2
+celluloid==0.2.0
+certifi==2021.10.8
+cffi @ file:///tmp/build/80754af9/cffi_1625814693446/work
+cfgv==3.3.1
+chardet @ file:///tmp/build/80754af9/chardet_1607706768982/work
+charset-normalizer==3.4.1
+chex==0.1.5
+click==8.1.8
+conda==4.10.3
+conda-build==3.21.5
+conda-package-handling @ file:///tmp/build/80754af9/conda-package-handling_1618262151086/work
+cryptography @ file:///tmp/build/80754af9/cryptography_1633521537906/work
+cycler==0.11.0
+datasets==2.13.2
+decorator @ file:///tmp/build/80754af9/decorator_1632776554403/work
+dill==0.3.6
+distlib==0.3.9
+dm-tree==0.1.8
+dnspython==2.1.0
+docker-pycreds==0.4.0
+einops==0.6.1
+etils==0.9.0
+fastjsonschema==2.21.1
+filelock==3.12.2
+flake8==5.0.4
+flatbuffers==1.12
+flax==0.5.0
+fonttools==4.38.0
+frozenlist==1.3.3
+fsspec==2023.1.0
+gast==0.4.0
+gitdb==4.0.12
+GitPython==3.1.44
+glob2 @ file:///home/linux1/recipes/ci/glob2_1610991677669/work
+google-api-core==2.24.2
+google-auth==2.38.0
+google-auth-oauthlib==0.4.6
+google-cloud-core==2.4.3
+google-cloud-storage==3.1.0
+google-crc32c==1.5.0
+google-pasta==0.2.0
+google-resumable-media==2.7.2
+googleapis-common-protos==1.69.2
+grpcio==1.62.3
+h5py==3.8.0
+huggingface-hub==0.16.4
+hydra-core==1.3.2
+identify==2.5.24
+idna @ file:///home/linux1/recipes/ci/idna_1610986105248/work
+importlib-metadata==4.2.0
+importlib-resources==5.12.0
+ipython @ file:///tmp/build/80754af9/ipython_1632141056704/work
+isort==5.11.5
+jax==0.3.21
+jaxlib==0.3.20+cuda11.cudnn82
+jedi @ file:///tmp/build/80754af9/jedi_1611333758854/work
+Jinja2 @ file:///tmp/build/80754af9/jinja2_1612213139570/work
+jsonschema==4.17.3
+jupyter-core==4.12.0
+jupytext==1.13.4
+keras==2.9.0
+Keras-Preprocessing==1.1.2
+kiwisolver==1.4.5
+libarchive-c @ file:///tmp/build/80754af9/python-libarchive-c_1617780486945/work
+libclang==18.1.1
+Markdown==3.3.4
+markdown-it-py==1.1.0
+MarkupSafe==2.1.5
+matplotlib==3.5.1
+matplotlib-inline @ file:///tmp/build/80754af9/matplotlib-inline_1628242447089/work
+mccabe==0.7.0
+mdit-py-plugins==0.3.5
+mkl-fft==1.3.1
+mkl-random @ file:///tmp/build/80754af9/mkl_random_1626179032232/work
+mkl-service==2.4.0
+msgpack==1.0.5
+multidict==6.0.5
+multiprocess==0.70.14
+mypy-extensions==1.0.0
+nbformat==5.8.0
+nodeenv==1.9.1
+numpy @ file:///tmp/build/80754af9/numpy_and_numpy_base_1634106693478/work
+oauthlib==3.2.2
+olefile==0.46
+omegaconf==2.3.0
+opt-einsum==3.3.0
+optax==0.1.4
+packaging==24.0
+pandas==1.3.5
+parso @ file:///tmp/build/80754af9/parso_1617223946239/work
+pathspec==0.11.2
+pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
+pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
+Pillow==8.4.0
+pkginfo==1.7.1
+pkgutil-resolve-name==1.3.10
+platformdirs==2.6.2
+pre-commit==2.21.0
+promise==2.3
+prompt-toolkit @ file:///tmp/build/80754af9/prompt-toolkit_1633440160888/work
+proto-plus==1.26.1
+protobuf==3.20.3
+psutil @ file:///tmp/build/80754af9/psutil_1612298016854/work
+ptyprocess @ file:///tmp/build/80754af9/ptyprocess_1609355006118/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl
+pyarrow==12.0.1
+pyasn1==0.5.1
+pyasn1-modules==0.3.0
+pycodestyle==2.9.1
+pycosat==0.6.3
+pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
+pyflakes==2.5.0
+Pygments @ file:///tmp/build/80754af9/pygments_1629234116488/work
+pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1608057966937/work
+pyparsing==3.1.4
+pyrsistent==0.19.3
+PySocks @ file:///tmp/build/80754af9/pysocks_1594394576006/work
+python-dateutil==2.9.0.post0
+python-etcd==0.4.5
+python-version==0.0.2
+pytz==2021.3
+PyYAML==5.4.1
+requests @ file:///tmp/build/80754af9/requests_1608241421344/work
+requests-oauthlib==2.0.0
+rsa==4.9
+ruamel-yaml-conda @ file:///tmp/build/80754af9/ruamel_yaml_1616016701961/work
+scipy==1.7.3
+seaborn==0.12.2
+sentry-sdk==2.23.1
+setproctitle==1.3.3
+six @ file:///tmp/build/80754af9/six_1623709665295/work
+smmap==5.0.2
+soupsieve @ file:///tmp/build/80754af9/soupsieve_1616183228191/work
+tensorboard==2.9.0
+tensorboard-data-server==0.6.1
+tensorboard-plugin-wit==1.8.1
+tensorflow==2.9.0
+tensorflow-datasets==4.8.2
+tensorflow-estimator==2.9.0
+tensorflow-io-gcs-filesystem==0.34.0
+tensorflow-metadata==1.12.0
+termcolor==2.3.0
+toml==0.10.2
+tomli==2.0.1
+toolz==0.12.1
+torch==1.10.1
+torchaudio==0.10.1
+torchelastic==0.2.0
+torchfsdd==1.0.0
+torchtext==0.11.1
+torchvision==0.11.2
+tqdm==4.67.1
+traitlets @ file:///tmp/build/80754af9/traitlets_1632522747050/work
+typed-ast==1.5.5
+typing-extensions==4.7.1
+urllib3==1.26.20
+virtualenv==20.16.2
+wandb==0.18.7
+wcwidth @ file:///Users/ktietz/demo/mc3/conda-bld/wcwidth_1629357192024/work
+Werkzeug==2.2.3
+wrapt==1.16.0
+xxhash==3.5.0
+yarl==1.9.4
+zipp==3.15.0

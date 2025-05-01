@@ -1,5 +1,5 @@
 ---
-title: "The Annotated S4 이해하기 ②: HiPPO 초기화부터 S4의 효율적인 커널 계산까지"
+title: "[Annotated S4] 이해하기 ②: HiPPO 초기화부터 S4의 효율적인 커널 계산까지"
 date: 2025-04-18 18:00:00 +0900
 description: "본 글은 S4에 대한 이해를 돕기 위해 Annotated-S4를 바탕으로 작성된 글입니다."
 math: true
