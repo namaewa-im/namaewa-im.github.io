@@ -1,7 +1,7 @@
 ---
-title: "[Annotated S4] 이해하기 ①: 상태공간방정식부터 S4의 구현까지"
+title: "[Annotated S4] Annotated-s4 이해하기 ①"
 date: 2025-04-17 23:00:00 +0900
-description: "본 글은 S4에 대한 이해를 돕기 위해 Annotated-S4를 바탕으로 작성된 글입니다."
+description: "상태공간방정식부터 단순 S4의 구현까지"
 math: true
 image:
   path: /assets/img/s4/2025-04-17-thumb.jpg
