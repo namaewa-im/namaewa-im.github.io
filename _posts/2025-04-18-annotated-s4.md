@@ -1,11 +1,7 @@
 ---
 title: "[Annotated S4] Annotated-s4 이해하기 ②"
 date: 2025-04-18 18:00:00 +0900
-description: "HiPPO 초기화부터 S4의 효율적인 커널 계산까지"
 math: true
-image:
-  path: /assets/img/s4/2025-04-17-thumb.jpg
-  alt: "S4"
 categories: [SSM, S4, HiPPO, Sequence Modeling]
 tags: [SSM, S4, HiPPO, Annotated-S4, LRA]
 ---

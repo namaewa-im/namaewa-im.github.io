@@ -1,11 +1,7 @@
 ---
 title: "[Annotated S4] Annotated-s4 이해하기 ①"
 date: 2025-04-17 23:00:00 +0900
-description: "상태공간방정식부터 단순 S4의 구현까지"
 math: true
-image:
-  path: /assets/img/s4/2025-04-17-thumb.jpg
-  alt: "S4"
 categories: [SSM, S4, Sequence Modeling]
 tags: [SSM, S4, Annotated-S4, LRA]
 ---

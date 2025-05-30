@@ -1,11 +1,7 @@
 ---
 title: "[Annotated S4] 코드 실행 방법 및 코드 리뷰"
 date: 2025-05-01 21:00:00 +0900
-description: "본 글은 https://github.com/srush/annotated-s4를 바탕으로 작성된 글입니다."
 math: true
-image:
-  path: /assets/img/favicons/favicon-96x96.png
-  alt: "S4"
 categories: [code]
 tags: [SSM, S4, Annotated-S4, Docker, JAX,]
 ---
