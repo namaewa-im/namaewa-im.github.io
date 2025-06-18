@@ -3,6 +3,7 @@ title: "[Annotated S4] 코드 실행 방법 및 코드 리뷰"
 date: 2025-05-01 21:00:00 +0900
 math: true
 categories: [code]
+description: "S4 코드 리뷰"
 tags: [SSM, S4, Annotated-S4, Docker, JAX,]
 ---
 
